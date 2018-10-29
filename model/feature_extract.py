@@ -19,9 +19,9 @@ class FeatureExtractor(nn.Module):
     def forward(self, x):
         outputs = []
         for name, module in self.submodule._modules.items():
-            if name is "fc": x = x.view(x.size(0), -1)
+            if name in ["fc", "classifier"]: 
+                continue
             x = module(x) 
-            # print(name)
             if name in self.extracted_layers:
                 outputs.append(x)
         return outputs
@@ -39,10 +39,16 @@ def extract_feature(txt, exactor, sava_path):
             line = line.rstrip()
             words = line.split()
             img = Image.open(words[0]).convert('RGB')
-            img = trans(img)
+            if torch.cuda.is_available():
+                img = trans(img).cuda()
+            else:
+                img = trans(img)
             x = Variable(img).view(-1, 3, 224, 224)
             fea = exactor(x)[0].view(-1)
-            features.append(fea.detach().numpy())
+            if torch.cuda.is_available():
+                features.append(fea.detach().cpu().numpy())
+            else:
+                features.append(fea.detach().numpy())
         features = np.array(features)
         if features.shape[1] != feature_num:
             pca = decomposition.PCA(n_components=feature_num)
@@ -60,12 +66,14 @@ resnet = models.resnet18()
 resnet.fc = nn.Linear(in_features=512, out_features=38, bias=True)
 resnet.load_state_dict(torch.load(model_path, map_location='cpu'))
 
-extractor=FeatureExtractor(resnet, exact_list)
-# extractor=FeatureExtractor(resnet,exact_list).cuda()
+if torch.cuda.is_available():
+    extractor=FeatureExtractor(resnet,exact_list).cuda()
+else:
+    extractor=FeatureExtractor(resnet, exact_list)
 
 for dataset in datasets:
-    savepath = 'data/' + dataset + '/features/'
-    listpath = 'data/' + dataset + '/' + dataset + '.txt'
+    savepath = '../data/' + dataset + '/features/'
+    listpath = '../data/' + dataset + '/' + dataset + '.txt'
     model_name = 'resnet18'
     if not os.path.exists(savepath):
         os.makedirs(savepath)

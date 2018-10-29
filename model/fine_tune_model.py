@@ -1,13 +1,12 @@
-import torch
-from torchvision import models
-from torch import nn
-from torch import optim
-from torch.autograd import Variable
-from torchvision import transforms
-from torch.utils.data import Dataset, DataLoader
-from PIL import Image
-import numpy as np
 import os
+
+import numpy as np
+import torch
+from PIL import Image
+from torch import nn, optim
+from torch.autograd import Variable
+from torch.utils.data import DataLoader, Dataset
+from torchvision import models, transforms
 
 class_num = 38
 batch_size = 8
@@ -45,18 +44,21 @@ class MyDataset(Dataset):
 
 
 def fine_tune_resnet18():
-    train_data=MyDataset(txt='data/train/train.txt', transform=trans)
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
-    test_data=MyDataset(txt='data/test/test.txt', transform=trans)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
     model_path = 'YaleResnet18.pth'
     if os.path.exists(model_path):
         resnet_model = models.resnet18()
-        resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        if torch.cuda.is_available():
+            resnet_model.load_state_dict(torch.load(model_path))
+        else:
+            resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
         resnet_model.fc = nn.Linear(in_features=512, out_features=class_num, bias=True)
-        #resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
         print('Load model succeed!')
     else:   
+        print('Model not exists.')
         resnet_model = models.resnet18(pretrained=True)
         resnet_model.fc = nn.Linear(in_features=512, out_features=class_num, bias=True)
     if torch.cuda.is_available():
@@ -65,16 +67,18 @@ def fine_tune_resnet18():
     return resnet_model, train_data, train_loader, test_data, test_loader, model_path
 
 def fine_tune_resnet34():
-    train_data=MyDataset(txt='data/train/train.txt', transform=trans)
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
-    test_data=MyDataset(txt='data/test/test.txt', transform=trans)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
     model_path = 'YaleResnet34.pth'
     if os.path.exists(model_path):
         resnet_model = models.resnet34()
-        resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        if torch.cuda.is_available():
+            resnet_model.load_state_dict(torch.load(model_path))
+        else:
+            resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
         resnet_model.fc = nn.Linear(in_features=512, out_features=class_num, bias=True)
-        #resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
         print('Load model succeed!')
     else:   
         resnet_model = models.resnet34(pretrained=True)
@@ -85,34 +89,61 @@ def fine_tune_resnet34():
     return resnet_model, train_data, train_loader, test_data, test_loader, model_path   
 
 def fine_tune_resnet50():
-    train_data=MyDataset(txt='data/train/train.txt', transform=trans)
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
-    test_data=MyDataset(txt='data/test/test.txt', transform=trans)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
     model_path = 'YaleResnet50.pth'
     if os.path.exists(model_path):
         resnet_model = models.resnet50()
-        resnet_model.load_state_dict(torch.load(model_path))
-        resnet_model.fc = nn.Linear(in_features=512, out_features=class_num, bias=True)
-        #resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        if torch.cuda.is_available():
+            resnet_model.load_state_dict(torch.load(model_path))
+        else:
+            resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        resnet_model.fc = nn.Linear(in_features=2048, out_features=class_num, bias=True)
         print('Load model succeed!')
     else:   
         resnet_model = models.resnet50(pretrained=True)
-        resnet_model.fc = nn.Linear(in_features=512, out_features=class_num, bias=True)
+        resnet_model.fc = nn.Linear(in_features=2048, out_features=class_num, bias=True)
+    if torch.cuda.is_available():
+        resnet_model = resnet_model.cuda()
+    print(resnet_model)
+    return resnet_model, train_data, train_loader, test_data, test_loader, model_path   
+
+def fine_tune_resnet101():
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
+    train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
+    test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
+    model_path = 'YaleResnet101.pth'
+    if os.path.exists(model_path):
+        resnet_model = models.resnet101()
+        if torch.cuda.is_available():
+            resnet_model.load_state_dict(torch.load(model_path))
+        else:
+            resnet_model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        resnet_model.fc = nn.Linear(in_features=2048, out_features=class_num, bias=True)
+        print('Load model succeed!')
+    else:   
+        resnet_model = models.resnet101(pretrained=True)
+        resnet_model.fc = nn.Linear(in_features=2048, out_features=class_num, bias=True)
     if torch.cuda.is_available():
         resnet_model = resnet_model.cuda()
     print(resnet_model)
     return resnet_model, train_data, train_loader, test_data, test_loader, model_path   
 
 def fine_tune_vgg16():
-    train_data=MyDataset(txt='data/train/train.txt', transform=trans)
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
-    test_data=MyDataset(txt='data/test/test.txt', transform=trans)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
     model_path = 'YaleVgg16.pth'
     if os.path.exists(model_path):
         model = models.vgg16()
-        model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(model_path))
+        else:
+            model.load_state_dict(torch.load(model_path, map_location='cpu'))
         model.classifier = nn.Sequential(nn.Linear(25088, 4096),      #vgg16
                                  nn.ReLU(),
                                  nn.Dropout(p=0.5),
@@ -120,10 +151,9 @@ def fine_tune_vgg16():
                                  nn.ReLU(),
                                  nn.Dropout(p=0.5),
                                  nn.Linear(4096, class_num))
-        # model.load_state_dict(torch.load(model_path, map_location='cpu'))
         print('Load model succeed!')
     else:   
-        model = models.resnet50(pretrained=True)
+        model = models.vgg16(pretrained=True)
         model.classifier = nn.Sequential(nn.Linear(25088, 4096),      #vgg16
                             nn.ReLU(),
                             nn.Dropout(p=0.5),
@@ -137,35 +167,62 @@ def fine_tune_vgg16():
     return model, train_data, train_loader, test_data, test_loader, model_path   
 
 def fine_tune_densenet121():
-    train_data=MyDataset(txt='data/train/train.txt', transform=trans)
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
-    test_data=MyDataset(txt='data/test/test.txt', transform=trans)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
     test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
     model_path = 'YaleDense121.pth'
     if os.path.exists(model_path):
         model = models.densenet121()
-        model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(model_path))
+        else:
+            model.load_state_dict(torch.load(model_path, map_location='cpu'))
         model.classifier = nn.Linear(1024, class_num, True)
-        # model.load_state_dict(torch.load(model_path, map_location='cpu'))
         print('Load model succeed!')
     else:   
-        model = models.resnet50(pretrained=True)
+        model = models.densenet121(pretrained=True)
         model.classifier = nn.Linear(1024, class_num, True)
     if torch.cuda.is_available():
         model = model.cuda()
     print(model)
     return model, train_data, train_loader, test_data, test_loader, model_path 
 
+def fine_tune_densenet161():
+    train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
+    train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
+    test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
+    test_loader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=False)
+    model_path = 'YaleDense161.pth'
+    if os.path.exists(model_path):
+        model = models.densenet161()
+        if torch.cuda.is_available():
+            model.load_state_dict(torch.load(model_path))
+        else:
+            model.load_state_dict(torch.load(model_path, map_location='cpu'))
+        model.classifier = nn.Linear(2208, class_num, True)
+        print('Load model succeed!')
+    else:   
+        model = models.densenet161(pretrained=True)
+        model.classifier = nn.Linear(2208, class_num, True)
+    if torch.cuda.is_available():
+        model = model.cuda()
+    print(model)
+    return model, train_data, train_loader, test_data, test_loader, model_path 
+
 def fine_tune(net, train_data, train_loader, test_data, test_loader, path):
-    optimizer = optim.Adam(net.parameters())
+    optimizer = optim.Adam(net.parameters(), 1e-4)
     loss_func = nn.CrossEntropyLoss()
-    for epoch in range(15):
+    for epoch in range(30):
         print('epoch {}'.format(epoch + 1))
         # training
         train_loss = 0.0
         train_acc = 0.0
         for batch_x, batch_y in train_loader:
-            batch_x, batch_y = Variable(batch_x.cuda()), Variable(batch_y.cuda())
+            if torch.cuda.is_available():
+                batch_x, batch_y = Variable(batch_x.cuda()), Variable(batch_y.cuda())
+            else:
+                batch_x, batch_y = Variable(batch_x), Variable(batch_y)
             out = net(batch_x)
 
             loss = loss_func(out, batch_y)
@@ -180,7 +237,10 @@ def fine_tune(net, train_data, train_loader, test_data, test_loader, path):
         #evaluation
         acc = 0.0
         for batch_x, batch_y in test_loader:
-            batch_x, batch_y = Variable(batch_x.cuda()), Variable(batch_y.cuda())
+            if torch.cuda.is_available():
+                batch_x, batch_y = Variable(batch_x.cuda()), Variable(batch_y.cuda())
+            else:
+                batch_x, batch_y = Variable(batch_x), Variable(batch_y)
             out = net(batch_x)
             loss = loss_func(out, batch_y)
             pred = torch.max(out, 1)[1]
@@ -204,10 +264,18 @@ def fine_tune(net, train_data, train_loader, test_data, test_loader, path):
 #net, train_data, train_loader, test_data, test_loader, path = fine_tune_resnet50()
 #fine_tune(net, train_data, train_loader, test_data, test_loader, path)
 
+# resnet101
+#net, train_data, train_loader, test_data, test_loader, path = fine_tune_resnet101()
+#fine_tune(net, train_data, train_loader, test_data, test_loader, path)
+
 #vgg16
 #net, train_data, train_loader, test_data, test_loader, path = fine_tune_vgg16()
 #fine_tune(net, train_data, train_loader, test_data, test_loader, path)
 
 #densenet121
 #net, train_data, train_loader, test_data, test_loader, path = fine_tune_densenet121()
+#fine_tune(net, train_data, train_loader, test_data, test_loader, path)
+
+#densenet161
+#net, train_data, train_loader, test_data, test_loader, path = fine_tune_densenet161()
 #fine_tune(net, train_data, train_loader, test_data, test_loader, path)
