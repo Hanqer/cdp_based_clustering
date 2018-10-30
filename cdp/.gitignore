@@ -1,7 +1,6 @@
-data/
+experiment/
 *.pkl
 *.npy
 *.bin
 *.pth
 *.pyc
-*.json
