@@ -1,0 +1,21 @@
+
+# unadjustable parameters (if need modificaiton, create a new experiment folder along with a new config file)
+base: "resnet18"
+committee: ['resnet34', 'resnet50', 'resnet101', 'densenet121', 'vgg16', 'densenet161'] # list of strings, note that the name should be consistent with your feature file names.
+k: 20
+data_name: "unlabel"
+feat_dim: 128
+
+# adjustable paramters
+strategy: mediator # vote or mediator
+vote:
+    accept_num: 8 # <= len(committee), not applicable if len(committee) == 0
+    threshold: 0.3 # usual range: [0.3, 0.8], lower threshold --> higher recall and lower prec
+mediator:
+    threshold: 0.96 #0.96
+    input: ['relationship', 'affinity', 'distribution']
+    phase: test # train or test
+    pair_file: /path/to/pair.npy
+    pair_pred_file: /path/to/prediction.py
+
+evaluation: True
