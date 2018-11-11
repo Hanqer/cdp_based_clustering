@@ -5,3 +5,4 @@ data/
 *.pth
 *.pyc
 *.json
+/cluster/get_YaleB.py

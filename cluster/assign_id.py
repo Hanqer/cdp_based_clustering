@@ -18,9 +18,14 @@ trans = transforms.Compose([
 def default_loader(path):
     return Image.open(path).convert('RGB')
 class MyDataset(Dataset):
+<<<<<<< HEAD
     def __init__(self, txt, transform=None, target_transform=None, loader=default_loader,root_path = 'data/train/'):
         fh = open(txt, 'r')
         self.root_path =root_path
+=======
+    def __init__(self, txt, transform=None, target_transform=None, loader=default_loader):
+        fh = open(txt, 'r')
+>>>>>>> 789ce2996556d55dff79e4a4f9c3665f2385a74a
         imgs = []
         for line in fh:
             line = line.strip('\n')
@@ -35,6 +40,7 @@ class MyDataset(Dataset):
 
     def __getitem__(self, index):
         fn, label = self.imgs[index]
+<<<<<<< HEAD
         img = self.loader(self.root_path+fn)
         if self.transform is not None:
             img = self.transform(img)
@@ -42,6 +48,12 @@ class MyDataset(Dataset):
         data['img'] = img
         data['id'] = fn.split('.')[0]
         return data,label
+=======
+        img = self.loader(fn)
+        if self.transform is not None:
+            img = self.transform(img)
+        return img,label
+>>>>>>> 789ce2996556d55dff79e4a4f9c3665f2385a74a
 
     def __len__(self):
         return len(self.imgs)

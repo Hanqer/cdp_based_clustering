@@ -44,6 +44,7 @@ class MyDataset(Dataset):
 
 
 def fine_tune_resnet18():
+    print('resnet18....')
     train_data=MyDataset(txt='../data/train/train.txt', transform=trans)
     train_loader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
     test_data=MyDataset(txt='../data/test/test.txt', transform=trans)
@@ -252,9 +253,9 @@ def fine_tune(net, train_data, train_loader, test_data, test_loader, path):
 
 
 
-# resnet18
-# net, train_data, train_loader, test_data, test_loader, path = fine_tune_resnet18()
-# fine_tune(net, train_data, train_loader, test_data, test_loader, path)
+#resnet18
+net, train_data, train_loader, test_data, test_loader, path = fine_tune_resnet18()
+fine_tune(net, train_data, train_loader, test_data, test_loader, path)
 
 # resnet34
 #net, train_data, train_loader, test_data, test_loader, path = fine_tune_resnet34()

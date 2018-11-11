@@ -4,7 +4,7 @@ import os
 from skimage import io
 from skimage import transform
 
-data = sio.loadmat('data/YaleB_32x32.mat')
+data = sio.loadmat('YaleB_32x32.mat')
 samples = data['fea']
 labels = data['gnd']
 samples = np.hstack((samples, labels))
@@ -15,7 +15,7 @@ num_label = int(length*0.1)
 num_unlabel = int(length*0.5)
 num_test = int(length*0.4)
 
-data_path = 'data/train/'
+data_path = 'train/'
 if(not os.path.exists(data_path)):
     os.makedirs(data_path)
 with open(data_path+'train.txt', 'w') as f:
@@ -26,7 +26,7 @@ with open(data_path+'train.txt', 'w') as f:
         f.write(img_path + ' ' + str(image[-1]-1) + '\n')
 
 
-data_path = 'data/unlabel/'
+data_path = 'unlabel/'
 if(not os.path.exists(data_path)):
     os.makedirs(data_path)
 with open(data_path+'unlabel.txt', 'w') as f:
@@ -36,7 +36,7 @@ with open(data_path+'unlabel.txt', 'w') as f:
         io.imsave(img_path, img)
         f.write(img_path + ' ' + str(image[-1]-1) + '\n')
 
-data_path = 'data/test/'
+data_path = 'test/'
 if(not os.path.exists(data_path)):
     os.makedirs(data_path)
 with open(data_path+'test.txt', 'w') as f:
